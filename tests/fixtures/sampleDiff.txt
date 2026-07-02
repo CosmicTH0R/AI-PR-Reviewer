@@ -1,0 +1,53 @@
+diff --git a/src/auth/login.ts b/src/auth/login.ts
+new file mode 100644
+index 0000000..a3f9b21
+--- /dev/null
++++ b/src/auth/login.ts
+@@ -0,0 +1,30 @@
++import { Request, Response } from 'express';
++import { db } from '../db';
++
++export async function login(req: Request, res: Response) {
++  const { username, password } = req.body;
++
++  // WARNING: SQL injection vulnerability
++  const query = `SELECT * FROM users WHERE username = '${username}' AND password = '${password}'`;
++  const user = await db.query(query);
++
++  if (!user) {
++    res.status(401).json({ error: 'Invalid credentials' });
++    return;
++  }
++
++  const token = generateToken(user);
++  res.json({ token });
++}
++
++function generateToken(user: any) {
++  // TODO: use proper JWT library
++  return Buffer.from(JSON.stringify(user)).toString('base64');
++}
+diff --git a/src/utils/helper.ts b/src/utils/helper.ts
+index 1234567..89abcde 100644
+--- a/src/utils/helper.ts
++++ b/src/utils/helper.ts
+@@ -1,10 +1,15 @@
+ export function formatDate(date: Date): string {
+-  return date.toString();
++  return date.toISOString().split('T')[0];
+ }
+ 
++export function sanitizeInput(input: string): string {
++  return input.trim().replace(/[<>'"]/g, '');
++}
++
+ export function calculateAge(birthDate: Date): number {
+   const today = new Date();
+   const age = today.getFullYear() - birthDate.getFullYear();
++  // Fix: account for month/day not yet reached this year
++  const monthDiff = today.getMonth() - birthDate.getMonth();
++  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
++    return age - 1;
++  }
+   return age;
+ }
