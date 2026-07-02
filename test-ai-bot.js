@@ -23,3 +23,11 @@ function authenticate(user, pass) {
     }
     return false;
 }
+
+// Added to generate a new commit hash and trigger the webhook
+function badlyNamedFunc() {
+    var x = 10;
+    if (x = 5) { // intentional assignment instead of equality
+        console.log("x is 5!");
+    }
+}
