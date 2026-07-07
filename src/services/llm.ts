@@ -7,7 +7,7 @@ import { logger } from '../utils/logger';
 export class LLMService {
   private genAI: GoogleGenerativeAI;
   // Use flash for speed, cost, and native JSON mode support
-  private modelName = 'gemini-2.0-flash';
+  private modelName = 'gemini-2.5-flash';
 
   constructor() {
     const apiKey = process.env.GEMINI_API_KEY;
